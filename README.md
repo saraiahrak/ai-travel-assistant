@@ -1,6 +1,6 @@
 # Travel AI Assistant (DSPy + LangGraph)
 
-A state-aware travel routing agent designed to handle complex multi-turn context and intent classification using local Large Language Models (**Ollama / Qwen 2.5 3B**). 
+A state-aware travel routing agent designed to handle complex multi-turn context and intent classification using local LLM (**Ollama / Qwen 2.5 3B**). 
 
 This project utilizes **DSPy** for programmatic optimization and **LangGraph** for robust state management. By moving away from manual "Prompt Engineering" toward a compiled approach, the agent achieves high accuracy in resolving ambiguous user queries and maintaining location context.
 
@@ -24,7 +24,6 @@ travel-ai-assistant/
 ├── schema.py              # DSPy Signatures and State definitions
 ├── dspy_modules/          # Compiled programs and optimized weights
 │   └── travel_router_v1.json
-└── optimizers/            # Optimization and Validation scripts
     ├── router_data.py     # Training (Trainset) and Testing (Devset) data
     ├── train_router.py    # Script to compile/optimize the Router
     └── test_router.py     # Script to evaluate accuracy on unseen data
@@ -67,7 +66,7 @@ ollama run qwen2.5:3b
 To re-compile the router logic based on updated training data:
 
 ```bash
-python -m optimizers.train_router
+python -m dspy_modules.train_router
 ```
 
 ### 4. Validation (The Testing Phase)
@@ -75,7 +74,7 @@ python -m optimizers.train_router
 Verify the model's accuracy on the held-out development set:
 
 ```bash
-python -m optimizers.test_router
+python -m dspy_modules.test_router
 ```
 
 ### 5. Execution
@@ -84,6 +83,14 @@ Run the assistant:
 
 ```bash
 python main.py
+```
+
+OR
+
+Run the streamlit based gui version:
+
+```bash
+python gui.py
 ```
 
 ---

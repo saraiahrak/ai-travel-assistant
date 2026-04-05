@@ -9,22 +9,22 @@ class AgentState(TypedDict):
     location: str
     is_interrupted: bool
 
-# class TravelRouter(dspy.Signature):
-#     """Analyze chat history. Identify if the user is asking about the current city or a new one."""
-#     context = dspy.InputField(desc="History and currently known location.")
-#     query = dspy.InputField(desc="User's latest request.")
-#     next_step = dspy.OutputField(desc="fetch_destinations, fetch_attractions, fetch_packing, or general_chat")
-#     target_city = dspy.OutputField(desc="The city being discussed.")
-
-
 class TravelRouter(dspy.Signature):
-    """Categorize travel queries and extract the destination city."""
-    context = dspy.InputField(desc="Past messages and current city.")
-    query = dspy.InputField(desc="User's current question.")
-    
-    # Use the desc to define the 'API' of your graph, not to 'prompt' the model.
+    """Analyze chat history. Identify if the user is asking about the current city or a new one."""
+    context = dspy.InputField(desc="History and currently known location.")
+    query = dspy.InputField(desc="User's latest request.")
     next_step = dspy.OutputField(desc="fetch_destinations, fetch_attractions, fetch_packing, or general_chat")
-    target_city = dspy.OutputField(desc="The city mentioned or the one from context.")
+    target_city = dspy.OutputField(desc="The city being discussed.")
+
+
+# class TravelRouter(dspy.Signature):
+#     """Categorize travel queries and extract the destination city."""
+#     context = dspy.InputField(desc="Past messages and current city.")
+#     query = dspy.InputField(desc="User's current question.")
+    
+#     # Use the desc to define the 'API' of your graph, not to 'prompt' the model.
+#     next_step = dspy.OutputField(desc="fetch_destinations, fetch_attractions, fetch_packing, or general_chat")
+#     target_city = dspy.OutputField(desc="The city mentioned or the one from context.")
 
 class TravelPlanner(dspy.Signature):
     """Expert Travel Assistant using external_data to provide natural responses."""

@@ -6,31 +6,31 @@ from schema import *
 from schema import TravelRouter
 
 def router_node(state: AgentState):
-    print("--- [ROUTING] ---")
+    print("\n--- [ROUTING] ---")
     router = dspy.Predict(TravelRouter)
     router.load("dspy_modules/travel_router_v1.json")
 
-    # 1. Capture the existing location from the state
-    existing_loc = state.get("location")
+    # 1. Get the current city from state
+    current_city = state.get("location")
     
-    # 2. Run the Model
+    # 2. Run the model with the last known city as context
     response = router(
-        context=f"Current Location: {existing_loc}\nHistory: {state['messages'][-3:]}",
+        context=f"Last known city: {current_city}",
         query=state["messages"][-1].content
     )
 
-    # 3. THE RECOVERY LOGIC
-    # Check if the model found a city in the query string itself
-    model_city = response.target_city if response.target_city and str(response.target_city).lower() != "none" else None
+    # 3. Create the update dict with ONLY the next step first
+    update = {"next_step": response.next_step}
     
-    # Logic: 
-    # - If the model found a city (e.g. "Thailand"), use it.
-    # - If the model found NOTHING, but we already have a city in State, use State.
-    # - Otherwise, it's truly None.
-    final_city = model_city or existing_loc
+    # 4. ONLY add 'location' if the model found a real, non-None city
+    if response.target_city and str(response.target_city).lower() != "none":
+        update["location"] = response.target_city
+        print(f"Decision: {response.next_step} for NEW city: {response.target_city}")
+    else:
+        # We don't add 'location' to the update, so LangGraph keeps 'Thailand'
+        print(f"Decision: {response.next_step} using PERSISTENT city: {current_city}")
 
-    print(f"Decision: {response.next_step} for {final_city}")
-    return {"location": final_city, "next_step": response.next_step}
+    return update
 
 def recommendation_node(state: AgentState):
     print("--- [SPECIALIST: DESTINATIONS] ---")
@@ -81,7 +81,7 @@ def weather_tool_node(state: AgentState):
         res = requests.get(search_url).json()['results'][0]
         w_url = f"https://api.open-meteo.com/v1/forecast?latitude={res['latitude']}&longitude={res['longitude']}&current_weather=true"
         temp = requests.get(w_url).json()['current_weather']['temperature']
-        return {"external_data": f"Current weather in {res['name']}: {temp}°C."}
+        return {"location": location,"external_data": f"Current weather in {res['name']}: {temp}°C."}
     except:
         return {"external_data": "Weather data unavailable."}
 
