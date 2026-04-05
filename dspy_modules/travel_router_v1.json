@@ -1,0 +1,80 @@
+{
+  "traces": [],
+  "train": [],
+  "demos": [
+    {
+      "augmented": true,
+      "context": "Current Location: Iceland",
+      "query": "What should I bring for a trip there?",
+      "next_step": "fetch_packing",
+      "target_city": "Iceland"
+    },
+    {
+      "augmented": true,
+      "context": "Current Location: None",
+      "query": "What should I pack for my next trip?",
+      "next_step": "fetch_packing",
+      "target_city": "None"
+    },
+    {
+      "augmented": true,
+      "context": "Current Location: Paris",
+      "query": "Are there any cool festivals in July?",
+      "next_step": "fetch_attractions",
+      "target_city": "Paris"
+    },
+    {
+      "context": "Current Location: None",
+      "query": "Let's go to Sydney. Any tips?",
+      "next_step": "fetch_attractions",
+      "target_city": "Sydney"
+    },
+    {
+      "context": "Current Location: Thailand",
+      "query": "Is it better to go there in June?",
+      "next_step": "fetch_attractions",
+      "target_city": "Thailand"
+    },
+    {
+      "context": "Current Location: Berlin",
+      "query": "Do I need a jacket there?",
+      "next_step": "fetch_packing",
+      "target_city": "Berlin"
+    },
+    {
+      "context": "Current Location: Paris",
+      "query": "Actually, I've decided on Tokyo instead. What can I do there?",
+      "next_step": "fetch_attractions",
+      "target_city": "Tokyo"
+    }
+  ],
+  "signature": {
+    "instructions": "Categorize travel queries and extract the destination city.",
+    "fields": [
+      {
+        "prefix": "Context:",
+        "description": "Past messages and current city."
+      },
+      {
+        "prefix": "Query:",
+        "description": "User's current question."
+      },
+      {
+        "prefix": "Next Step:",
+        "description": "fetch_destinations, fetch_attractions, fetch_packing, or general_chat"
+      },
+      {
+        "prefix": "Target City:",
+        "description": "The city mentioned or the one from context."
+      }
+    ]
+  },
+  "lm": null,
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.9",
+      "dspy": "2.6.27",
+      "cloudpickle": "3.1"
+    }
+  }
+}

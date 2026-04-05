@@ -3,26 +3,34 @@ import requests
 from langgraph.types import interrupt
 from langchain_core.messages import AIMessage
 from schema import *
-
+from schema import TravelRouter
 
 def router_node(state: AgentState):
-     print("--- [ROUTING] ---")
-     router = dspy.Predict(TravelRouter)
+    print("--- [ROUTING] ---")
+    router = dspy.Predict(TravelRouter)
+    router.load("dspy_modules/travel_router_v1.json")
+
+    # 1. Capture the existing location from the state
+    existing_loc = state.get("location")
     
-     # We pass the current state['location'] as part of the context 
-     # so DSPy knows what the conversation is currently 'about'.
-     response = router(
-         context=f"Current Location: {state.get('location')}\nHistory: {state['messages'][-3:]}",
-         query=state["messages"][-1].content
-     )
+    # 2. Run the Model
+    response = router(
+        context=f"Current Location: {existing_loc}\nHistory: {state['messages'][-3:]}",
+        query=state["messages"][-1].content
+    )
 
-     # If the model finds a new city, we use it. 
-     # If it returns nothing/None, we keep the one we already have.
-     # This is standard state management, not a hack.
-     new_location = response.target_city if response.target_city and str(response.target_city).lower() != "none" else state.get("location")
+    # 3. THE RECOVERY LOGIC
+    # Check if the model found a city in the query string itself
+    model_city = response.target_city if response.target_city and str(response.target_city).lower() != "none" else None
+    
+    # Logic: 
+    # - If the model found a city (e.g. "Thailand"), use it.
+    # - If the model found NOTHING, but we already have a city in State, use State.
+    # - Otherwise, it's truly None.
+    final_city = model_city or existing_loc
 
-     print(f"Decision: {response.next_step} for {new_location}")
-     return {"location": new_location, "next_step": response.next_step}
+    print(f"Decision: {response.next_step} for {final_city}")
+    return {"location": final_city, "next_step": response.next_step}
 
 def recommendation_node(state: AgentState):
     print("--- [SPECIALIST: DESTINATIONS] ---")
